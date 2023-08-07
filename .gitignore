@@ -1,0 +1,7 @@
+# environment config file
+env.json
+
+# node.js related files
+package-lock.json
+package.json
+node_modules/
