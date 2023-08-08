@@ -8,9 +8,9 @@ const env = require('../env.json'); // load environment configuration
 const pg = require('pg'); // import the PostgreSQL client library
 const Pool = pg.Pool; // create a connection pool for managing database connections
 const pool = new Pool(env); // initialize a pool using the environment configuration
-
 const argon2 = require('argon2'); // import argon2 for password hashing
 
+app.use(express.static('public')); //use express to serve static files from 'public' folder
 
 // TODO: move these to their own class
 // custom error class for handling username not found error

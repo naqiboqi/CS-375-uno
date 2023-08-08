@@ -1,16 +1,14 @@
+// initialize user interface elements
 const loginMessage = document.getElementById("login-status");
 const userInput = document.getElementById("user-input");
 const passInput = document.getElementById("pass-input");
-
 const loginButton = document.getElementById("login-button");
-loginButton.addEventListener("click", () => {
-    const username = userInput.value;
-    const password = passInput.value; // Fixed the typo here
+const registerButton = document.getElementById("register-button");
 
-    doUserLogin(username, password);
-});
 
+// login function
 function doUserLogin(username, password) {
+    // make POST fetch request to server's endpoint '/login'
     fetch("/login", {
         headers: {
             'Accept': 'application/json',
@@ -30,8 +28,19 @@ function doUserLogin(username, password) {
     });
 }
 
-const newAccountButton = document.getElementById("new-account-button");
-newAccountButton.addEventListener("click", () => {
-    // Redirect the user to the signup.html page
+// add event listener to the login button
+loginButton.addEventListener("click", () => {
+    // get entered credentials
+    const username = userInput.value;
+    const password = passInput.value;
+
+    // call login function
+    doUserLogin(username, password);
+});
+
+// add event listener to the register button
+registerButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    // redirect the user to the signup.html page
     window.location.href = "/signup.html";
 });
