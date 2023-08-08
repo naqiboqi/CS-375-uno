@@ -1,18 +1,19 @@
-const express = require('express');
-const app = express();
-const http = require('http').createServer(app);
-const path = require('path');
-const io = require('socket.io')(http);
+const express = require('express'); // import express framework
+const app = express(); // create instance of express
+const http = require('http').createServer(app); // create http server using express instance
+const path = require('path'); // import path module for file path handling
+const io = require('socket.io')(http); // initialize socket.io for real-time communication
 
-const env = require('../env.json');
-const pg = require('pg');
-const Pool = pg.Pool;
-const pool = new Pool(env);
+const env = require('../env.json'); // load environment configuration
+const pg = require('pg'); // import the PostgreSQL client library
+const Pool = pg.Pool; // create a connection pool for managing database connections
+const pool = new Pool(env); // initialize a pool using the environment configuration
 
-const argon2 = require('argon2');
+const argon2 = require('argon2'); // import argon2 for password hashing
 
 
 // TODO: move these to their own class
+// custom error class for handling username not found error
 class UsernameNotFoundError extends Error {
     constructor(message) {
         super(message);
@@ -21,6 +22,7 @@ class UsernameNotFoundError extends Error {
 };
 
 
+// custom error class for handling invalid password error
 class InvalidPasswordError extends Error {
     constructor() {
         super('Invalid password.');
@@ -29,6 +31,7 @@ class InvalidPasswordError extends Error {
 };
 
 
+// serve the login.html file at the root path
 app.get("/", (req, res) => {
     res.status(200);
     res.setHeader("Content-Type", "text/html");
@@ -38,6 +41,7 @@ app.get("/", (req, res) => {
 });
 
 
+// handle account creation POST request
 app.post("/accountcreation", async (req, res) => {
     const username = req.body[username];
     const password = req.body[password];
@@ -48,6 +52,7 @@ app.post("/accountcreation", async (req, res) => {
 });
 
 
+// handle /login POST request
 app.post("/login", async (req, res) => {
     const username = req.body["username"];
     const password = red.body["password"];
@@ -70,6 +75,7 @@ app.post("/login", async (req, res) => {
 });
 
 
+// get the hashed password for a given username from the database
 async function getPasswordForUsername(username) {
     const queryText = 'SELECT password AS pass FROM users WHERE username = $1';
     const queryValue = [username];
@@ -85,11 +91,13 @@ async function getPasswordForUsername(username) {
 };
 
 
+// compare entered and stored hashed passwords
 async function isPassWordEqual(enteredPassword, storedPassword) {
     return (enteredPassword === storedPassword);
 };
 
 
+// start the http server
 http.listen(3000, () => {
     console.log("Now listening on port 3000");
 });
