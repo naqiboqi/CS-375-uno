@@ -1,5 +1,4 @@
 const LocalStrategy = require("passport-local").Strategy;
-const { authenticate } = require("passport");
 const { pool } = require("./dbConfig");
 const argon2 = require('argon2');
 
@@ -7,7 +6,7 @@ function initialize(passport) {
     const authenticateUser = async (username, password, done) => {
         try {
             const results = await pool.query(
-                `SELECT * FROM users WHERE email = $1`, [username]
+                `SELECT * FROM users WHERE name = $1`, [username]
             );
 
             if (results.rows.length > 0) {
