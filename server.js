@@ -43,14 +43,13 @@ wsServer.on('connection', (socket) => {
     socket.emit('message', 'Welcome to the WebSocket server!');
     
     socket.on('chatMessage', (message) => {
-        io.emit('chatMessage', message); // Broadcast the message to all clients
+        wsServer.emit('chatMessage', message); // broadcasting message sent to all clients/users
     });
 
     socket.on('disconnect', () => {
       console.log('a user just disconnected');
     });
 });
-
 
 
 // serve the login.html file at the root path
@@ -74,10 +73,11 @@ app.get("/dashboard", checkNotAuthenticated, (req, res) => {
 
 });
 
-app.get("/logout", (req, res) => {
-    req.logOut();
-    req.flash('success_message', 'You have successfully logged out');
-    res.redirect('/login');
+app.get("/logout", (req, res, next) => {
+    req.logOut(() => {
+        req.flash('success_message', 'You have successfully logged out');
+        res.redirect('/login');
+    });
 });
 
 app.post('/register', async (req, res) => {
