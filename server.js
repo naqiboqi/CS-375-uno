@@ -5,8 +5,14 @@ const argon2 = require('argon2'); // import argon2 for password hashing
 const session = require('express-session');
 const flash = require('express-flash');
 const passport = require('passport');
+const http = require('http');
+const socketIO = require('socket.io');
+
+const httpServer = http.createServer(app);
+const wsServer = socketIO(httpServer);
 
 const initializePassport = require('./passportConfig');
+
 initializePassport(passport);
 
 const port = 3000;
@@ -28,6 +34,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
+
+
+// handle websocket connections
+wsServer.on('connection', (socket) => {
+    console.log('a user just connected');
+  
+    socket.emit('message', 'Welcome to the WebSocket server!');
+    
+    socket.on('chatMessage', (message) => {
+        io.emit('chatMessage', message); // Broadcast the message to all clients
+    });
+
+    socket.on('disconnect', () => {
+      console.log('a user just disconnected');
+    });
+});
+
 
 
 // serve the login.html file at the root path
@@ -59,7 +82,6 @@ app.get("/logout", (req, res) => {
 
 app.post('/register', async (req, res) => {
     let {username, password, password2} = req.body;
-    console.log({username, password, password2});
 
     let errors = [];
 
@@ -86,8 +108,6 @@ app.post('/register', async (req, res) => {
                 `SELECT * FROM users WHERE name = $1`, [username]
             );
         
-            console.log("here");
-            console.log(results.rows);
         
             if (results.rows.length > 0) {
                 errors.push({ message: "Username already in use" });
@@ -97,13 +117,12 @@ app.post('/register', async (req, res) => {
                     if (err) {
                         throw err;
                     }
-                    console.log(results.rows);
                     req.flash('success_message', 'Your account has been registered. Please log in');
                     res.redirect('/login');
                 })
             }
         } catch (err) {
-            // Handle errors
+            // handle errors
             throw err;
         }
     }
@@ -111,8 +130,8 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/dashboard',
-    failiureRedirect: '/login',
-    failiureFlash: true
+    failureRedirect: '/login',
+    failureFlash: true,
 }));
 
 function checkAuthenticated(req, res, next) {
@@ -130,6 +149,6 @@ function checkNotAuthenticated(req, res, next) {
 }
 
 // start the http server
-app.listen(port, hostname, () => {
-    console.log(`Listening at: http://${hostname}:${port}`);
-});
+httpServer.listen(port, () => {
+    console.log(`WebSocket server is running on port ${port}`);
+  });

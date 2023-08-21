@@ -2,13 +2,15 @@
 <html>
     <head>
         <title>Dashboard</title>
+        <script src="/socket.io/socket.io.js"></script>
     </head>
 
     <body>
         <a href="/lobby">Join a game</a>
         <a href="/logout">Logout</a>
 
-        <h1>Hello, <%= user.charAT(0).toUpperCase() + user.slice(1) %>!</h1>
+        <h1>Hello, <%= user.charAt(0).toUpperCase() + user.slice(1) %>!</h1>
+
     </body>
 
 </html>
