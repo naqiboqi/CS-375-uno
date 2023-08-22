@@ -7,6 +7,7 @@ const flash = require('express-flash');
 const passport = require('passport');
 const http = require('http');
 const socketIO = require('socket.io');
+const path = require('path');
 
 const httpServer = http.createServer(app);
 const wsServer = socketIO(httpServer);
@@ -23,6 +24,8 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({
     extended: false
 }));
+
+app.use(express.static(path.join(__dirname, "static")));
 
 app.use(session({
     secret: 'secret',
@@ -57,6 +60,34 @@ app.get("/", (req, res) => {
     res.render("index");
 
 });
+
+app.get("/lobby", (req, res) => {
+    const roomCode = req.query.code;
+    res.render("lobby", {roomCode: roomCode, user: {isHost: true}, users: [
+        {name: "Ethan"},
+        {name: "Naqi"},
+        {name: "Fei"},
+        {name: "Test"}
+    ]});
+
+});
+
+app.get("/game", (req, res) => {
+    res.render("game", {user: {cards: [
+        {color: "red", type: "four"},
+        {color: "green", type: "four"},
+        {color: "blue", type: "four"},
+        {color: "yellow", type: "four"},
+        {color: "red", type: "reverse"},
+        {color: "blue", type: "skip"},
+        {color: "red", type: "+2"},
+    ]}, users: [
+        {name: "Ethan", numCards: 2},
+        {name: "Naqi", numCards: 5},
+        {name: "Fei", numCards: 1},
+        {name: "Test", numCards: 4}
+    ]});
+})
 
 app.get("/login", checkAuthenticated, (req, res) => {
     res.render("login");
